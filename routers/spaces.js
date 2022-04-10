@@ -81,6 +81,7 @@ router.delete("/:spaceId/stories/:storyId", auth, async (req, res, next) => {
       include: { model: Space, where: { id: spaceId }, right: true },
     });
 
+   
     if (!story) {
       res.status(404).send("Story not found");
     } else {
@@ -94,10 +95,39 @@ router.delete("/:spaceId/stories/:storyId", auth, async (req, res, next) => {
 
         res.send({ message: "ok", storyId });
       }
+
     }
   } catch (e) {
     console.log(e);
     next(e);
   }
 });
+
+//Updating space
+
+router.patch("/:id", auth, async (req, res) => {
+  const space = await Space.findByPk(req.params.id);
+  // if (!space.userId === req.user.id) {
+  //   return res
+  //     .status(403)
+  //     .send({ message: "You are not authorized to update this space" });
+  // }
+
+  if (space.userId !== req.user.id) {
+    return res
+      .status(403)
+      .send({ message: "You are not authorized to update this space" });
+  }
+  const { title, description, backgroundColor, color } = req.body;
+
+  await space.update({ title, description, backgroundColor, color });
+
+  return res.status(200).send({ space });
+});
+
+
+
+
+
+
 module.exports = router;
