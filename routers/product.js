@@ -1,13 +1,14 @@
 const { Router } = require("express");
 const auth = require("../auth/middleware");
-const Space = require("../models").space;
-const Story = require("../models").story;
+const Products = require("../models").product;
+// const Story = require("../models").story;
 const router = new Router();
 
 //get all the spaces
 router.get("/", async (req, res, next) => {
   try {
-    const spaces = await Space.findAll();
+    const spaces = await Products
+    .findAll();
     console.log(spaces);
     if (!spaces) {
       res.status(404).send("user not found!");
