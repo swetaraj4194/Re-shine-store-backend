@@ -16,7 +16,7 @@ const bodyParserMiddleWare = express.json();
 app.use(bodyParserMiddleWare);
 
 app.use("/auth", authRouter);
-app.use("/product", productRouter);
+app.use("/products", productRouter);
 
 // POST endpoint which requires a token for testing purposes, can be removed
 app.post("/authorized_post_request", authMiddleWare, (req, res) => {

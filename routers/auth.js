@@ -9,6 +9,7 @@ const { SALT_ROUNDS } = require("../config/constants");
 
 const router = new Router();
 
+
 router.post("/login", async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -21,17 +22,9 @@ router.post("/login", async (req, res, next) => {
 
     const user = await User.findOne({
       where: { email },
-      include: {
-        model: Space,
-        include: [Story],
-        order: [[Story, "createdAt", "DESC"]],
-      },
     });
 
-    // const space = await Space.findOne({
-    //   where: { userId: user.id },
-    //   include: [Story],
-    // });
+
 
     if (!user || !bcrypt.compareSync(password, user.password)) {
       return res.status(400).send({
@@ -46,13 +39,107 @@ router.post("/login", async (req, res, next) => {
       token,
       name: user.name,
       email: user.email,
-      space: user.spaces[0], // Just select the first space
+      
     });
   } catch (error) {
     console.log(error);
     return res.status(400).send({ message: "Something went wrong, sorry" });
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// router.post("/login", async (req, res, next) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     if (!email || !password) {
+//       return res
+//         .status(400)
+//         .send({ message: "Please provide both email and password" });
+//     }
+
+//     const user = await User.findOne({
+//       where: { email }
+//     });
+
+
+//     // const user = await User.findOne({
+//     //   where: { email },
+//     //   include: {
+//     //     model: Space,
+//     //     include: [Story],
+//     //     order: [[Story, "createdAt", "DESC"]],
+//     //   },
+//     // });
+
+//     // const space = await Space.findOne({
+//     //   where: { userId: user.id },
+//     //   include: [Story],
+//     // });
+
+//     if (!user || !bcrypt.compareSync(password, user.password)) {
+//       return res.status(400).send({
+//         message: "User with that email not found or password incorrect",
+//       });
+//     }
+
+//     delete user.dataValues["password"]; // don't send back the password hash
+//     const token = toJWT({ userId: user.id });
+
+//     return res.status(200).send({
+//       token,
+//       name: user.name,
+//       email: user.email,
+//       space: user.spaces[0], // Just select the first space
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(400).send({ message: "Something went wrong, sorry" });
+//   }
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 router.post("/signup", async (req, res) => {
   const { email, password, name } = req.body;
@@ -102,20 +189,20 @@ router.post("/signup", async (req, res) => {
 // The /me endpoint can be used to:
 // - get the users email & name using only their token
 // - checking if a token is (still) valid
-router.get("/me", authMiddleware, async (req, res) => {
-  const user = await User.findOne({
-    where: { id: req.user.id },
-    include: {
-      model: Space,
-      include: [Story],
-      order: [[Story, "createdAt", "DESC"]],
-    },
-  });
-  // don't send back the password hash
-  delete user.dataValues["password"];
-  res
-    .status(200)
-    .send({ name: user.name, email: user.email, space: user.spaces[0] });
-});
+// router.get("/me", authMiddleware, async (req, res) => {
+//   const user = await User.findOne({
+//     where: { id: req.user.id },
+//     include: {
+//       model: Space,
+//       include: [Story],
+//       order: [[Story, "createdAt", "DESC"]],
+//     },
+//   });
+//   // don't send back the password hash
+//   delete user.dataValues["password"];
+//   res
+//     .status(200)
+//     .send({ name: user.name, email: user.email, space: user.spaces[0] });
+// });
 
 module.exports = router;
