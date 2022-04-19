@@ -2,10 +2,10 @@ const { Router } = require("express");
 const auth = require("../auth/middleware");
 const Products = require("../models").product;
 const Category = require("../models").category;
-// const Story = require("../models").story;
+const Image = require("../models").image;
 const router = new Router();
 
-//get all the spaces
+//get all the products
 router.get("/", async (req, res, next) => {
   try {
     const items = await Products.findAll();
@@ -21,41 +21,8 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-// router.get("/category", async (req, res, next) => {
-//   try {
-//     const items = await Category.findAll();
-//     console.log(items);
-//     if (!items) {
-//       res.status(404).send("user not found!");
-//     } else {
-//       res.json(items);
-//     }
-//   } catch (e) {
-//     console.log(e.message);
-//     next(e);
-//   }
-// });
+//category page:
 
-//category page
-
-router.get("/:categoryId/product/:productId", async (req, res, next) => {
-  try {
-    const { categoryId, productId } = req.params;
-    const items = await Products.findByPk(productId, {
-      include: { model: Category, where: { id: categoryId }, right: true },
-    });
-    if (!items) {
-      res.status(404).send("user not found!");
-    } else {
-      res.json(items);
-    }
-  } catch (e) {
-    console.log(e);
-    next(e);
-  }
-});
-
-///////////////////////////////////
 router.get("/category/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -76,25 +43,26 @@ router.get("/category/:id", async (req, res) => {
   res.status(200).send({ category });
 });
 
-// router.get("/:id", async (req, res) => {
-//   const { id } = req.params;
+///details page
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
 
-//   console.log(id);
-//   if (isNaN(parseInt(id))) {
-//     return res.status(400).send({ message: "Space id is not a number" });
-//   }
+  console.log(id);
+  if (isNaN(parseInt(id))) {
+    return res.status(400).send({ message: "Product id is not a number" });
+  }
 
-//   const space = await Space.findByPk(id, {
-//     include: [Story],
-//     order: [[Story, "createdAt", "DESC"]],
-//   });
+  const product = await Products.findByPk(id, {
+    include: [Image],
+    order: [[Image, "createdAt", "DESC"]],
+  });
 
-//   if (space === null) {
-//     return res.status(404).send({ message: "Space not found" });
-//   }
+  if (product === null) {
+    return res.status(404).send({ message: "Product not found" });
+  }
 
-//   res.status(200).send({ message: "ok", space });
-// });
+  res.status(200).send({ message: "ok", product });
+});
 
 // /////////////////////////////////
 
