@@ -8,6 +8,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      name: {
+        type: Sequelize.STRING,
+      },
       review: {
         type: Sequelize.TEXT,
       },
@@ -19,10 +22,17 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
-
+      userId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "users",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      },
       productId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
         references: {
           model: "products",
           key: "id",

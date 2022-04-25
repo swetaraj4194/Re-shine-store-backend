@@ -31,6 +31,11 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        category: "Other",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
 
