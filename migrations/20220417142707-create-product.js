@@ -20,12 +20,23 @@ module.exports = {
       description: {
         type: Sequelize.TEXT,
       },
+
+      status: {
+        type: Sequelize.TEXT,
+      },
+
+      minimumBid: {
+        type: Sequelize.FLOAT,
+      },
+
       ratings: {
         type: Sequelize.FLOAT,
       },
+
       price: {
         type: Sequelize.FLOAT,
       },
+
       add_cart: {
         type: Sequelize.INTEGER,
       },

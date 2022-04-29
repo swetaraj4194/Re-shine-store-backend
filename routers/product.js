@@ -25,7 +25,6 @@ router.get("/", async (req, res, next) => {
 });
 
 //get product category wise:
-
 router.get("/category/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -81,8 +80,7 @@ router.get("/:id", async (req, res) => {
   res.status(200).send({ message: "ok", product });
 });
 
-// get seller details for buying
-
+// get seller details to buying products
 router.get("/buy/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -107,10 +105,17 @@ router.get("/buy/:id", async (req, res, next) => {
 });
 
 //post product to sell
-
 router.post("/new", authMiddleware, async (req, res) => {
-  const { title, description, price, mainImage, categoryId, amount, images } =
-    req.body;
+  const {
+    title,
+    description,
+    price,
+    mainImage,
+    status,
+    categoryId,
+    minimumBid,
+    images,
+  } = req.body;
 
   if (!title) {
     return res.status(400).send({ message: "A product must have a title" });
@@ -137,7 +142,9 @@ router.post("/new", authMiddleware, async (req, res) => {
     description,
     price,
     mainImage,
+    status,
     categoryId,
+    minimumBid,
     ratings: 0,
     userId: req.user.id,
     add_cart: 0,
@@ -160,19 +167,11 @@ router.post("/new", authMiddleware, async (req, res) => {
 
   // const newImages = await Image.create({ image, productId: newProduct.id });
 
-  const newBid = await Bid.create({
-    email: req.user.email,
-    amount: amount || 0,
-    userId: req.user.id,
-    productId: newProduct.id,
-  });
-
   return res.status(201).send({
     message: "Product created",
     product: {
       ...newProduct.dataValues,
       images: newImages,
-      bid: newBid,
     },
   });
 });
@@ -242,7 +241,7 @@ router.post("/bids/:id", authMiddleware, async (req, res) => {
     })
   );
 
-  if (amount < maxBid) {
+  if (amount <= maxBid || amount <= ProductWithBid.minimumBid) {
     return res
       .status(404)
       .send({ message: "Your bid amount should be higher than other bids" });
@@ -284,6 +283,31 @@ router.post("/comment/:id", authMiddleware, async (req, res) => {
   });
 
   return res.status(201).send({ message: "Comment added", newReview });
+});
+
+//delete bid history
+
+router.delete("/bid/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const bidToDelete = await Bid.findByPk(parseInt(id));
+    // console.log("product to delete", bidToDelete);
+
+    if (!bidToDelete) {
+      return res.status(404).send("no product found");
+    }
+
+    await bidToDelete.destroy();
+
+    res.send({
+      message: `deleted bid history with id ${id}`,
+    });
+  } catch (e) {
+    res.status(500).send({ error: e });
+    console.log(e.message);
+    next(e);
+  }
 });
 
 module.exports = router;

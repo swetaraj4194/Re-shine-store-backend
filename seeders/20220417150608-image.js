@@ -245,6 +245,38 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+
+      {
+        image:
+          "https://assets.mmsrg.com/isr/166325/c1/-/ASSET_MMS_78976641/fee_194_131_png",
+        productId: 17,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+
+      {
+        image:
+          "https://assets.mmsrg.com/isr/166325/c1/-/ASSET_MMS_78976644/fee_194_131_png",
+        productId: 17,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+
+      {
+        image:
+          "https://assets.mmsrg.com/isr/166325/c1/-/ASSET_MMS_87365215/fee_194_131_png",
+        productId: 18,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+
+      {
+        image:
+          "https://assets.mmsrg.com/isr/166325/c1/-/ASSET_MMS_87365214/fee_194_131_png",
+        productId: 18,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
   down: async (queryInterface, Sequelize) => {

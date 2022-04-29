@@ -10,6 +10,8 @@ const { SALT_ROUNDS } = require("../config/constants");
 
 const router = new Router();
 
+//login endpoint
+
 router.post("/login", async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -22,13 +24,25 @@ router.post("/login", async (req, res, next) => {
 
     // const user = await User.findOne({ where: { email } });
 
+    // const user = await User.findOne({
+    //   where: { email },
+    //   include: [
+    //     { model: Bid, include: [Product] },
+    //     {
+    //       model: Product,
+    //       include: [Image],
+    //       order: [[Image, "createdAt", "DESC"]],
+    //     },
+    //   ],
+    // });
+
     const user = await User.findOne({
       where: { email },
       include: [
         { model: Bid, include: [Product] },
         {
           model: Product,
-          include: [Image],
+          include: [{ model: Image }, { model: Bid }],
           order: [[Image, "createdAt", "DESC"]],
         },
       ],
@@ -59,7 +73,7 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
-////signup
+////signup endpoint
 
 router.post("/signup", async (req, res) => {
   const { email, password, name, phone } = req.body;
@@ -102,7 +116,7 @@ router.get("/me", authMiddleware, async (req, res) => {
       { model: Bid, include: [Product] },
       {
         model: Product,
-        include: [Image],
+        include: [{ model: Image }, { model: Bid }],
         order: [[Image, "createdAt", "DESC"]],
       },
     ],

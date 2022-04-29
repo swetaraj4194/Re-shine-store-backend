@@ -15,8 +15,6 @@ module.exports = (sequelize, DataTypes) => {
       product.hasMany(models.image);
       product.hasMany(models.review);
       product.hasMany(models.bid);
-
-    
     }
   }
   product.init(
@@ -24,6 +22,8 @@ module.exports = (sequelize, DataTypes) => {
       title: DataTypes.STRING,
       mainImage: DataTypes.TEXT,
       description: DataTypes.TEXT,
+      status: DataTypes.TEXT,
+      minimumBid: DataTypes.INTEGER,
       ratings: DataTypes.FLOAT,
       price: DataTypes.FLOAT,
       add_cart: DataTypes.INTEGER,
