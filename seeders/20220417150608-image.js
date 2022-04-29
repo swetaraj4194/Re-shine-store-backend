@@ -237,6 +237,46 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+
+      {
+        image:
+          "https://www.hema.nl/dw/image/v2/BBRK_PRD/on/demandware.static/-/Sites-HEMA-master-catalog/default/dw67667d2f/product/05710083_02_001_01.jpg?sw=529&sh=600&sm=fit",
+        productId: 16,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+
+      {
+        image:
+          "https://assets.mmsrg.com/isr/166325/c1/-/ASSET_MMS_78976641/fee_194_131_png",
+        productId: 17,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+
+      {
+        image:
+          "https://assets.mmsrg.com/isr/166325/c1/-/ASSET_MMS_78976644/fee_194_131_png",
+        productId: 17,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+
+      {
+        image:
+          "https://assets.mmsrg.com/isr/166325/c1/-/ASSET_MMS_87365215/fee_194_131_png",
+        productId: 18,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+
+      {
+        image:
+          "https://assets.mmsrg.com/isr/166325/c1/-/ASSET_MMS_87365214/fee_194_131_png",
+        productId: 18,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
   down: async (queryInterface, Sequelize) => {

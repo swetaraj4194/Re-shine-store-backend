@@ -45,10 +45,9 @@ Default config is setup for usage with an ElephantSQL database instance, you nee
     "url": "YOUR_ELEPHANTSQL_URL_HERE",
     "dialect": "postgres",
     "operatorsAliases": "0"
-  },
+  }
 }
 ```
-
 
 If planning to use this template with a docker database the config object should be changed to:
 
@@ -67,7 +66,6 @@ If planning to use this template with a docker database the config object should
 ```
 
 And you must revert the changes on this line in models/index.js: https://github.com/Codaisseur/express-template/commit/ada7711c8b19c8f240bc61f94743213efe4a77d2#diff-18c449caa39363f82bacb4f7489e7783L15
-
 
 6. Create database, run migrations & seed data
 
@@ -140,3 +138,8 @@ They can found in [./sampleRequests/httpie.md](./sampleRequests/httpie.md)
 - [Signup, Login & auth middleware](https://github.com/Codaisseur/express-template/pull/3)
 - [Configure cors](https://github.com/Codaisseur/express-template/pull/4)
 - [Seed using models & add delay middleware](https://github.com/Codaisseur/express-template/pull/5)
+
+//https://portfolio-utils.netlify.app/cloudinary
+https://www.youtube.com/watch?v=Y-VgaRwWS3o&ab_channel=PedroTech
+
+xevkbl7f

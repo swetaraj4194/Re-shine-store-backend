@@ -10,12 +10,11 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       review.belongsTo(models.product);
+      review.belongsTo(models.user);
     }
   }
   review.init(
-    {
-      review: DataTypes.TEXT,
-    },
+    { name: DataTypes.STRING, review: DataTypes.TEXT },
     {
       sequelize,
       modelName: "review",

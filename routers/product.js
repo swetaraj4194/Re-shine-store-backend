@@ -1,19 +1,22 @@
 const { Router } = require("express");
-const auth = require("../auth/middleware");
-const Products = require("../models").product;
-// const Story = require("../models").story;
+const authMiddleware = require("../auth/middleware");
+const Product = require("../models").product;
+const Category = require("../models").category;
+const Image = require("../models").image;
+const User = require("../models").user;
+const Bid = require("../models").bid;
+const Review = require("../models").review;
 const router = new Router();
 
-//get all the spaces
+//get all the products
 router.get("/", async (req, res, next) => {
   try {
-    const spaces = await Products
-    .findAll();
-    console.log(spaces);
-    if (!spaces) {
+    const items = await Product.findAll();
+    console.log(items);
+    if (!items) {
       res.status(404).send("user not found!");
     } else {
-      res.json(spaces);
+      res.json(items);
     }
   } catch (e) {
     console.log(e.message);
@@ -21,114 +24,290 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+//get product category wise:
+router.get("/category/:id", async (req, res) => {
+  const { id } = req.params;
+
+  // console.log(id);
+  if (isNaN(parseInt(id))) {
+    return res.status(400).send({ message: "category id is not a number" });
+  }
+
+  const category = await Category.findByPk(id, {
+    include: [Product],
+    order: [[Product, "createdAt", "DESC"]],
+  });
+
+  if (category === null) {
+    return res.status(404).send({ message: "category not found" });
+  }
+
+  res.status(200).send({ category });
+});
+
+/// get product details with product id
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
 
   console.log(id);
   if (isNaN(parseInt(id))) {
-    return res.status(400).send({ message: "Space id is not a number" });
+    return res.status(400).send({ message: "Product id is not a number" });
   }
 
-  const space = await Space.findByPk(id, {
-    include: [Story],
-    order: [[Story, "createdAt", "DESC"]],
+  const product = await Product.findByPk(id, {
+    include: [
+      {
+        model: Image,
+      },
+      {
+        model: Bid,
+      },
+      {
+        model: Image,
+      },
+      {
+        model: Review,
+      },
+    ],
+
+    // order: [[Image, "createdAt", "DESC"]],
   });
 
-  if (space === null) {
-    return res.status(404).send({ message: "Space not found" });
+  if (product === null) {
+    return res.status(404).send({ message: "Product not found" });
   }
 
-  res.status(200).send({ message: "ok", space });
+  res.status(200).send({ message: "ok", product });
 });
 
-/////////////////////////////////
-
-router.post("/:id/stories", auth, async (req, res) => {
-  const space = await Space.findByPk(req.params.id);
-  console.log(space);
-
-  if (space === null) {
-    return res.status(404).send({ message: "This space does not exist" });
-  }
-
-  if (!space.userId === req.user.id) {
-    return res
-      .status(403)
-      .send({ message: "You are not authorized to update this space" });
-  }
-
-  const { name, imageUrl, content } = req.body;
-
-  if (!name) {
-    return res.status(400).send({ message: "A story must have a name" });
-  }
-
-  const story = await Story.create({
-    name,
-    imageUrl,
-    content,
-    spaceId: space.id,
-  });
-
-  return res.status(201).send({ message: "Story created", story });
-});
-
-////////////////////delete
-
-router.delete("/:spaceId/stories/:storyId", auth, async (req, res, next) => {
+// get seller details to buying products
+router.get("/buy/:id", async (req, res, next) => {
   try {
-    const { spaceId, storyId } = req.params;
-    const story = await Story.findByPk(storyId, {
-      include: { model: Space, where: { id: spaceId }, right: true },
+    const { id } = req.params;
+    const product = await Product.findOne({
+      where: { id },
+      include: [
+        {
+          model: User,
+        },
+      ],
     });
 
-   
-    if (!story) {
-      res.status(404).send("Story not found");
-    } else {
-      // Check if this user is the owner of the space
-      if (story.space.userId !== req.user.id) {
-        return res
-          .status(401)
-          .send("You're not authorized to delete this story");
-      } else {
-        await story.destroy();
-
-        res.send({ message: "ok", storyId });
-      }
-
+    if (!product) {
+      res.status(404).send("Seller not found");
     }
+
+    res.send({ message: "ok", product });
   } catch (e) {
     console.log(e);
     next(e);
   }
 });
 
-//Updating space
+//post product to sell
+router.post("/new", authMiddleware, async (req, res) => {
+  const {
+    title,
+    description,
+    price,
+    mainImage,
+    status,
+    categoryId,
+    minimumBid,
+    images,
+  } = req.body;
 
-router.patch("/:id", auth, async (req, res) => {
-  const space = await Space.findByPk(req.params.id);
-  // if (!space.userId === req.user.id) {
-  //   return res
-  //     .status(403)
-  //     .send({ message: "You are not authorized to update this space" });
-  // }
-
-  if (space.userId !== req.user.id) {
-    return res
-      .status(403)
-      .send({ message: "You are not authorized to update this space" });
+  if (!title) {
+    return res.status(400).send({ message: "A product must have a title" });
   }
-  const { title, description, backgroundColor, color } = req.body;
 
-  await space.update({ title, description, backgroundColor, color });
+  if (!price || price <= 0) {
+    return res
+      .status(400)
+      .send({ message: "A product must have a price larger than 0" });
+  }
 
-  return res.status(200).send({ space });
+  if (!mainImage) {
+    return res
+      .status(400)
+      .send({ message: "A product must have a main image" });
+  }
+
+  if (!categoryId) {
+    return res.status(400).send({ message: "A product must have a category" });
+  }
+
+  const newProduct = await Product.create({
+    title,
+    description,
+    price,
+    mainImage,
+    status,
+    categoryId,
+    minimumBid,
+    ratings: 0,
+    userId: req.user.id,
+    add_cart: 0,
+  });
+
+  // const imagesWithProductId = images
+  //   .map((image) => ({
+  //     image: image,
+  //     productId: newProduct?.id,
+  //   }));
+
+  const imagesWithProductId = images
+    .filter((image) => image !== "")
+    .map((image) => ({
+      image: image,
+      productId: newProduct?.id,
+    }));
+
+  const newImages = await Image.bulkCreate(imagesWithProductId);
+
+  // const newImages = await Image.create({ image, productId: newProduct.id });
+
+  return res.status(201).send({
+    message: "Product created",
+    product: {
+      ...newProduct.dataValues,
+      images: newImages,
+    },
+  });
 });
 
+///delete post
+router.delete("/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
+    const productToDelete = await Product.findByPk(parseInt(id));
+    // console.log("product to delete", productToDelete);
 
+    if (!productToDelete) {
+      return res.status(404).send("no product found");
+    }
 
+    await productToDelete.destroy();
 
+    res.send({
+      message: `deleted product with id ${id}`,
+      // imageDeleted,
+    });
+  } catch (e) {
+    res.status(500).send({ error: e });
+    console.log(e.message);
+    next(e);
+  }
+});
+
+// update user details
+router.patch("/:id", authMiddleware, async (req, res) => {
+  const user = await User.findByPk(req.params.id);
+
+  if (user.email !== req.user.email) {
+    return res
+      .status(403)
+      .send({ message: "You are not authorized to update this profile" });
+  }
+  const { name, email, phone } = req.body;
+
+  const result = await user.update({ name, email, phone });
+
+  return res.status(200).send(result);
+});
+
+//post bid amount
+
+router.post("/bids/:id", authMiddleware, async (req, res) => {
+  const product = await Product.findByPk(req.params.id);
+
+  const ProductWithBid = await Product.findByPk(product.id, { include: Bid });
+
+  if (product === null) {
+    return res.status(404).send({ message: "This product does not exist" });
+  }
+  if (!product.id === req.user.id) {
+    return res
+      .status(403)
+      .send({ message: "You are not authorized to update this user" });
+  }
+  const { amount } = req.body;
+
+  const maxBid = Math.max.apply(
+    Math,
+    ProductWithBid.bids.map(function (object) {
+      return object.amount;
+    })
+  );
+
+  if (amount <= maxBid || amount <= ProductWithBid.minimumBid) {
+    return res
+      .status(404)
+      .send({ message: "Your bid amount should be higher than other bids" });
+  }
+
+  const newBid = await Bid.create({
+    email: req.user.email,
+    amount,
+    userId: req.user.id,
+    productId: product.id,
+  });
+
+  return res.status(201).send({ message: "Bid added", newBid });
+});
+
+//post comment
+router.post("/comment/:id", authMiddleware, async (req, res) => {
+  const product = await Product.findByPk(req.params.id);
+
+  const ProductWithComment = await Product.findByPk(product.id, {
+    include: Review,
+  });
+
+  if (product === null) {
+    return res.status(404).send({ message: "This product does not exist" });
+  }
+  if (!product.id === req.user.id) {
+    return res
+      .status(403)
+      .send({ message: "You are not authorized to update this user" });
+  }
+  const { review } = req.body;
+
+  const newReview = await Review.create({
+    name: req.user.name,
+    review,
+    userId: req.user.id,
+    productId: product.id,
+  });
+
+  return res.status(201).send({ message: "Comment added", newReview });
+});
+
+//delete bid history
+
+router.delete("/bid/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const bidToDelete = await Bid.findByPk(parseInt(id));
+    // console.log("product to delete", bidToDelete);
+
+    if (!bidToDelete) {
+      return res.status(404).send("no product found");
+    }
+
+    await bidToDelete.destroy();
+
+    res.send({
+      message: `deleted bid history with id ${id}`,
+    });
+  } catch (e) {
+    res.status(500).send({ error: e });
+    console.log(e.message);
+    next(e);
+  }
+});
 
 module.exports = router;

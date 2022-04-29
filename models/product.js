@@ -9,18 +9,21 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      product.belongsTo(models.user);
 
       product.belongsTo(models.category);
       product.hasMany(models.image);
       product.hasMany(models.review);
+      product.hasMany(models.bid);
     }
   }
   product.init(
     {
-      email: DataTypes.STRING,
       title: DataTypes.STRING,
       mainImage: DataTypes.TEXT,
       description: DataTypes.TEXT,
+      status: DataTypes.TEXT,
+      minimumBid: DataTypes.INTEGER,
       ratings: DataTypes.FLOAT,
       price: DataTypes.FLOAT,
       add_cart: DataTypes.INTEGER,
