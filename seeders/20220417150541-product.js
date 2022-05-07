@@ -332,7 +332,7 @@ module.exports = {
         ratings: 3.2,
         price: 900,
         add_cart: 0,
-        categoryId: 3,
+        categoryId: 2,
         userId: 2,
         createdAt: new Date(),
         updatedAt: new Date(),
